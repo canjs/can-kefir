@@ -43,10 +43,10 @@
   ],
   "dependencies": {
     "can-cid": "^1.0.3",
-    "can-observation": "^3.3.3",
-    "can-reflect": "^1.2.6",
+    "can-observation": "^3.3.0",
+    "can-reflect": "^1.2.0",
     "can-symbol": "^1.0.0",
-    "can-util": "^3.9.8",
+    "can-util": "^3.9.0",
     "kefir": "^3.5.1"
   },
   "devDependencies": {
