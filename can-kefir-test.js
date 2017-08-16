@@ -1,7 +1,7 @@
 var QUnit = require("steal-qunit");
 var Kefir = require("can-kefir");
 var canReflect = require("can-reflect");
-
+var batch = require("can-event/batch/batch");
 
 QUnit.module("can-kefir", {
 
@@ -60,4 +60,18 @@ QUnit.test("streams have a cid", function(){
 
 	var stream = Kefir.stream(function(){});
 	QUnit.ok(stream._cid, "streams have a cid");
+});
+
+QUnit.test("callbacks are within a batch", function(){
+	var EMITTER;
+	var stream = Kefir.stream(function(emitter){
+		EMITTER = emitter;
+	});
+
+	function valueHandler(){
+		QUnit.ok(batch.batchNum, "batchNum exists");
+	}
+	canReflect.onKeyValue(stream,"value", valueHandler);
+
+	EMITTER.value(1);
 });

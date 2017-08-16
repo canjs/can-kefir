@@ -43,6 +43,7 @@
   ],
   "dependencies": {
     "can-cid": "^1.0.3",
+    "can-event": "^3.7.0",
     "can-observation": "^3.3.0",
     "can-reflect": "^1.2.0",
     "can-symbol": "^1.0.0",
