@@ -90,7 +90,6 @@ QUnit.test("properties can be read without binding", function(){
 });
 
 QUnit.test("Kefir.emitterProperty", function(){
-	var EMITTER;
 	var stream = new Kefir.emitterProperty();
 
 

@@ -71,7 +71,7 @@ function getCurrentValue(stream, key) {
 		var VALUE,
 			valueHandler = function(value){
 				VALUE = value;
-			}
+			};
 		stream[names.on](valueHandler);
 		stream[names.off](valueHandler);
 		return VALUE;
@@ -138,7 +138,7 @@ canReflect.assignSymbols(Kefir.Observable.prototype, {
 			var observeData = getObserveData(this);
 			var currentValue = getCurrentValue(this, key);
 			// save current value so we won't through events if we provided a value
-			return observeData[key] = currentValue
+			return observeData[key] = currentValue;
 		}
 		return getObserveData(this)[key];
 
@@ -158,7 +158,7 @@ Kefir.emitterProperty = function(){
 		}
 		return function(){
 			emitter = undefined;
-		}
+		};
 	});
 
 	var property = stream.toProperty(function(){
@@ -185,7 +185,7 @@ Kefir.emitterProperty = function(){
 		"can.setKeyValue": function(key, value){
 			this[key](value);
 		}
-	})
+	});
 
 	return property;
 };
