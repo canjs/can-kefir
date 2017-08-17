@@ -75,3 +75,62 @@ QUnit.test("callbacks are within a batch", function(){
 
 	EMITTER.value(1);
 });
+
+QUnit.test("properties can be read without binding", function(){
+	var EMITTER;
+	var property = Kefir.stream(function(emitter){
+		EMITTER = emitter;
+	}).toProperty();
+
+	property.onValue(function(){});
+	EMITTER.value(10);
+
+	QUnit.equal( canReflect.getKeyValue(property,"value"), 10, "got property value" );
+
+});
+
+QUnit.test("Kefir.emitterProperty", function(){
+	var EMITTER;
+	var stream = new Kefir.emitterProperty();
+
+
+	var valueEventCount = 0;
+	function valueHandler(value){
+		valueEventCount++;
+		if(valueEventCount === 1) {
+			QUnit.equal(value, 1, "produced a value");
+		} else if (valueEventCount === 2) {
+			QUnit.equal(value, 2, "produced a value");
+		} else {
+			QUnit.ok(false, "should not be called");
+		}
+	}
+	canReflect.onKeyValue(stream,"value", valueHandler);
+
+	stream.value(1);
+
+	QUnit.equal( canReflect.getKeyValue(stream,"value"), 1, "got initial value");
+
+	canReflect.setKeyValue( stream, "value", 2);
+	canReflect.offKeyValue(stream,"value", valueHandler);
+	stream.value(3);
+
+
+	var errorEventCount = 0;
+	function errorHandler(value){
+		errorEventCount++;
+		if(errorEventCount === 1) {
+			QUnit.equal(value, "a", "produced an error");
+		} else {
+			QUnit.ok(false, "no more errors");
+		}
+	}
+	canReflect.onKeyValue(stream,"error", errorHandler);
+
+	stream.error("a");
+
+	QUnit.equal( canReflect.getKeyValue(stream,"error"), "a", "got initial value");
+
+	canReflect.offKeyValue(stream,"error", errorHandler);
+	stream.error("b");
+});
