@@ -133,3 +133,15 @@ QUnit.test("Kefir.emitterProperty", function(){
 	canReflect.offKeyValue(stream,"error", errorHandler);
 	stream.error("b");
 });
+
+QUnit.test("get behavior with constant stream", function(){
+	var stream = Kefir.stream(function(emit){
+		emit.value(1);
+	});
+
+	canReflect.onKeyValue(stream, "value", function(newVal){
+		QUnit.equal(newVal, 1, "got new Value");
+	});
+
+	QUnit.equal( canReflect.getKeyValue(stream,"value"), 1, "undefined");
+});
