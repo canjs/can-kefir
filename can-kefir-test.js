@@ -106,13 +106,13 @@ QUnit.test("Kefir.emitterProperty", function(){
 	}
 	canReflect.onKeyValue(stream,"value", valueHandler);
 
-	stream.value(1);
+	stream.emit(1);
 
 	QUnit.equal( canReflect.getKeyValue(stream,"value"), 1, "got initial value");
 
 	canReflect.setKeyValue( stream, "value", 2);
 	canReflect.offKeyValue(stream,"value", valueHandler);
-	stream.value(3);
+	stream.emit(3);
 
 
 	var errorEventCount = 0;

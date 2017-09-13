@@ -10,7 +10,7 @@ directly on it.  This is a useful writable stream.
 @type {function}
 
 Emitter property creates a Kefir [property](https://rpominov.github.io/kefir/#about-observables),
-but then adds a `value` and `error` method that calls the
+but then adds a `emit` and `error` method that calls the
 property's [emitter object](https://rpominov.github.io/kefir/#emitter-object).
 
 The end result is a single object that has methods of a stream, property and
@@ -25,7 +25,7 @@ age.onValue(function(age){
   console.log(age)
 });
 
-age.value(20) //-> logs 20
+age.emit(20) //-> logs 20
 
-age.value(30) //-> logs 30
+age.emit(30) //-> logs 30
 ```

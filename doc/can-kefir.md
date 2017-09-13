@@ -60,7 +60,7 @@ age.onValue(function(age){
   console.log(age)
 });
 
-age.value(20) //-> logs 20
+age.emit(20) //-> logs 20
 
-age.value(30) //-> logs 30
+age.emit(30) //-> logs 30
 ```

@@ -163,9 +163,9 @@ if (Kefir) {
 		var property = stream.toProperty(function(){
 			return lastValue;
 		});
-		property.value = stream.emit = function(newValue) {
+		property.emit = function(newValue) {
 			if(emitter) {
-				return emitter.value(newValue);
+				return emitter.emit(newValue);
 			} else {
 				setLastValue = true;
 				lastValue = newValue;
@@ -182,7 +182,7 @@ if (Kefir) {
 
 		canReflect.assignSymbols(property,{
 			"can.setKeyValue": function(key, value){
-				this[key](value);
+				this[key === "value" ? "emit" : key](value);
 			}
 		});
 
