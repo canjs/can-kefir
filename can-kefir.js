@@ -62,6 +62,9 @@ function getCurrentValue(stream, key) {
 		return stream._currentEvent.value;
 	} else {
 		var names = keyNames[key];
+		if(!names) {
+			return stream[key];
+		}
 		var VALUE,
 			valueHandler = function(value){
 				VALUE = value;
@@ -125,11 +128,11 @@ if (Kefir) {
 			}
 		},
 		"can.getKeyValue": function(key){
-			//!steal-remove-start
+
 			if(!keyNames[key]) {
-				dev.warn("can-kefir: You can not listen to the "+key+" property on a Kefir stream.");
+				return this[key];
 			}
-			//!steal-remove-end
+
 			Observation.add(this, key);
 			// we haven't been bound ... see what we can get from the observable
 			if(!this[observeDataSymbol]) {

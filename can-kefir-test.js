@@ -145,3 +145,8 @@ QUnit.test("get behavior with constant stream", function(){
 
 	QUnit.equal( canReflect.getKeyValue(stream,"value"), 1, "undefined");
 });
+
+QUnit.test("read emitter", function(){
+	var stream = new Kefir.emitterProperty();
+	QUnit.equal( canReflect.getKeyValue(stream,"emitter"), stream.emitter, "got the emitter");
+})
