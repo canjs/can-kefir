@@ -48,8 +48,7 @@ document.body.appendChild(frag);
 ## emitterProperty
 
 Use [can-kefir/emitterProperty] to create an stream object that also
-has its emitter's methods.  The following creates an `age` stream that
-we can emit events on with its `value()` method:
+has an emitter-like object attached.  The following creates an `age` stream that we can emit events on with its `emitter.value()` method:
 
 ```js
 var Kefir = require("can-kefir");
@@ -60,7 +59,7 @@ age.onValue(function(age){
   console.log(age)
 });
 
-age.value(20) //-> logs 20
+age.emitter.value(20) //-> logs 20
 
-age.value(30) //-> logs 30
+age.emitter.value(30) //-> logs 30
 ```
