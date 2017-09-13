@@ -106,13 +106,13 @@ QUnit.test("Kefir.emitterProperty", function(){
 	}
 	canReflect.onKeyValue(stream,"value", valueHandler);
 
-	stream.emit(1);
+	stream.emitter.emit(1);
 
 	QUnit.equal( canReflect.getKeyValue(stream,"value"), 1, "got initial value");
 
 	canReflect.setKeyValue( stream, "value", 2);
 	canReflect.offKeyValue(stream,"value", valueHandler);
-	stream.emit(3);
+	stream.emitter.value(3);
 
 
 	var errorEventCount = 0;
@@ -126,12 +126,12 @@ QUnit.test("Kefir.emitterProperty", function(){
 	}
 	canReflect.onKeyValue(stream,"error", errorHandler);
 
-	stream.error("a");
+	stream.emitter.error("a");
 
 	QUnit.equal( canReflect.getKeyValue(stream,"error"), "a", "got initial value");
 
 	canReflect.offKeyValue(stream,"error", errorHandler);
-	stream.error("b");
+	stream.emitter.error("b");
 });
 
 QUnit.test("get behavior with constant stream", function(){

@@ -163,26 +163,28 @@ if (Kefir) {
 		var property = stream.toProperty(function(){
 			return lastValue;
 		});
-		property.emit = function(newValue) {
-			if(emitter) {
-				return emitter.emit(newValue);
-			} else {
-				setLastValue = true;
-				lastValue = newValue;
+		property.emitter = {
+			value: function(newValue) {
+				if(emitter) {
+					return emitter.emit(newValue);
+				} else {
+					setLastValue = true;
+					lastValue = newValue;
+				}
+			},
+			error: function(error) {
+				if(emitter) {
+					return emitter.error(error);
+				} else {
+					lastError = error;
+				}
 			}
 		};
-
-		property.error = function(error) {
-			if(emitter) {
-				return emitter.error(error);
-			} else {
-				lastError = error;
-			}
-		};
+		property.emitter.emit = property.emitter.value;
 
 		canReflect.assignSymbols(property,{
 			"can.setKeyValue": function(key, value){
-				this[key === "value" ? "emit" : key](value);
+				this.emitter[key](value);
 			}
 		});
 
