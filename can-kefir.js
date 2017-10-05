@@ -5,6 +5,7 @@ var Kefir = require("kefir");
 var Observation = require("can-observation");
 var CID = require("can-cid");
 var canBatch = require("can-event/batch/batch");
+var defineLazyValue = require("can-define-lazy-value");
 
 var observeDataSymbol = canSymbol.for("can.observeData");
 
@@ -23,33 +24,6 @@ function getObserveData(stream) {
 	}
 	return observeData;
 }
-
-// TODO: use can-define's
-var replaceWith = function(obj, prop, cb, writable) {
-	Object.defineProperty(obj, prop, {
-		configurable: true,
-		get: function() {
-			Object.defineProperty(this, prop, {
-				value: undefined,
-				writable: true,
-				configurable: true
-			});
-			var value = cb.call(this, obj, prop);
-			Object.defineProperty(this, prop, {
-				value: value,
-				writable: !!writable
-			});
-			return value;
-		},
-		set: function(value){
-			Object.defineProperty(this, prop, {
-				value: value,
-				writable: !!writable
-			});
-			return value;
-		}
-	});
-};
 
 var keyNames = {
 	"value": {on: "onValue", handlers: "onValueHandlers", off: "offValue", handler: "onValueHandler"},
@@ -77,7 +51,7 @@ function getCurrentValue(stream, key) {
 
 if (Kefir) {
 	// makes the CID property a virtual property whose value gets defined later.
-	replaceWith(Kefir.Observable.prototype,"_cid", function(){
+	defineLazyValue(Kefir.Observable.prototype,"_cid", function(){
 		return CID({});
 	});
 
