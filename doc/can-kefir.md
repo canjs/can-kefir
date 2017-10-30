@@ -1,5 +1,6 @@
 @module {Object} can-kefir
-@parent can-ecosystem
+@parent can-observables
+@collection can-ecosystem
 @package ../package.json
 @group can-kefir/symbols symbols
 @group can-kefir/methods methods
