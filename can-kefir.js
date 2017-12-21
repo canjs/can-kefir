@@ -3,9 +3,7 @@ var canSymbol = require("can-symbol");
 var dev = require("can-util/js/dev/dev");
 var Kefir = require("kefir");
 var Observation = require("can-observation");
-var CID = require("can-cid");
 var canBatch = require("can-event/batch/batch");
-var defineLazyValue = require("can-define-lazy-value");
 
 var observeDataSymbol = canSymbol.for("can.observeData");
 
@@ -50,11 +48,6 @@ function getCurrentValue(stream, key) {
 }
 
 if (Kefir) {
-	// makes the CID property a virtual property whose value gets defined later.
-	defineLazyValue(Kefir.Observable.prototype,"_cid", function(){
-		return CID({});
-	});
-
 	// Observable is parent of Kefir.Stream
 	canReflect.assignSymbols(Kefir.Observable.prototype, {
 		"can.onKeyValue": function(key, handler){

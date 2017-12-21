@@ -43,11 +43,9 @@
     "streams"
   ],
   "dependencies": {
-    "can-cid": "^1.0.3",
-    "can-define-lazy-value": "^1.0.0",
     "can-event": "^3.7.0",
-    "can-observation": "^3.3.0",
-    "can-reflect": "^1.2.0",
+    "can-observation": "^4.0.0-pre.24",
+    "can-reflect": "^1.11.1",
     "can-symbol": "^1.0.0",
     "can-util": "^3.9.0",
     "kefir": "^3.5.1"
