@@ -1,5 +1,6 @@
-var QUnit = require("steal-qunit");
 var Kefir = require("can-kefir");
+var QUnit = require("steal-qunit");
+var queues = require("can-queues");
 var canReflect = require("can-reflect");
 
 QUnit.module("can-kefir");
@@ -71,6 +72,51 @@ QUnit.test("properties can be read without binding", function() {
 		10,
 		"got property value"
 	);
+});
+
+QUnit.test("properties caches value/error correctly when unbound", function(assert) {
+	var emitter;
+
+	var stream = Kefir.stream(function(e) {
+		emitter = e;
+	}).toProperty();
+
+	var handler = function noop() {};
+	canReflect.onKeyValue(stream, "value", handler);
+	emitter.value(10);
+	canReflect.offKeyValue(stream, "value", handler);
+
+	assert.equal(canReflect.getKeyValue(stream, "value"), 10);
+	assert.equal(canReflect.getKeyValue(stream, "error"), undefined);
+
+	canReflect.onKeyValue(stream, "value", handler);
+	assert.equal(canReflect.getKeyValue(stream, "value"), 10, "should be cached");
+	canReflect.offKeyValue(stream, "value", handler);
+});
+
+QUnit.test("callbacks are within a batch", function(assert) {
+	var emitter;
+	assert.expect(2);
+
+	var stream = Kefir.stream(function(e) {
+		emitter = e;
+	});
+
+	var valueChangeCounter = 0;
+	canReflect.onKeyValue(stream, "value", function onValueChange() {
+		valueChangeCounter += 1;
+	});
+
+	queues.batch.start();
+	emitter.value(1);
+	assert.equal(
+		valueChangeCounter,
+		0,
+		"handler should not be called while flushing is prevented"
+	);
+	queues.batch.stop();
+
+	assert.equal(valueChangeCounter, 1);
 });
 
 QUnit.test("Kefir.emitterProperty", function() {

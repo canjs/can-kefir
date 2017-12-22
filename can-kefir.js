@@ -130,7 +130,7 @@ canReflect.assignSymbols(Kefir.Observable.prototype, {
 			var currentValue = getCurrentValue(stream, key);
 
 			// save current value so we won't through events if we provided a value
-			meta.value = currentValue;
+			meta[key] = currentValue;
 
 			return currentValue;
 		}
