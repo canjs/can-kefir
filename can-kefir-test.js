@@ -184,3 +184,26 @@ QUnit.test("read emitter", function() {
 		"got the emitter"
 	);
 });
+
+QUnit.test("getValueDependencies with a single source", function(assert) {
+	var source = Kefir.sequentially(750, [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]);
+	var result = source.throttle(2500);
+
+	assert.deepEqual(canReflect.getValueDependencies(result), {
+		valueDependencies: new Set([source])
+	});
+});
+
+QUnit.test("getValueDependencies with multiple sources", function(assert) {
+	var a = Kefir.constant("a");
+	var b = Kefir.constant("b");
+	var c = Kefir.constant("c");
+
+	var combined = Kefir.combine([a, b, c], function(x, y, z) {
+		return x + y + z;
+	});
+
+	assert.deepEqual(canReflect.getValueDependencies(combined), {
+		valueDependencies: new Set([a, b, c])
+	});
+});
