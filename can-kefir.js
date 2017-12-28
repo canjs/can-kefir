@@ -134,6 +134,27 @@ canReflect.assignSymbols(Kefir.Observable.prototype, {
 
 			return currentValue;
 		}
+	},
+	"can.getValueDependencies": function getValueDependencies() {
+		var sources;
+		var stream = this;
+
+		// streams created by methods like .scan have a single source,
+		// stored in stream._source
+		if (stream._source != null) {
+			sources = [stream._source];
+
+		// ... while methods like .combine have multiple sources
+		// stored as an array in stream._sources
+		} else if (stream._sources != null) {
+			sources = stream._sources;
+		}
+
+		if (sources != null) {
+			return {
+				valueDependencies: new Set(sources)
+			};
+		}
 	}
 });
 
