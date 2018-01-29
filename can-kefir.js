@@ -1,46 +1,50 @@
-var canReflect = require("can-reflect");
-var canSymbol = require("can-symbol");
-var dev = require("can-util/js/dev/dev");
 var Kefir = require("kefir");
-var Observation = require("can-observation");
-var CID = require("can-cid");
-var canBatch = require("can-event/batch/batch");
-var defineLazyValue = require("can-define-lazy-value");
+var canSymbol = require("can-symbol");
+var canReflect = require("can-reflect");
+var mapEventsMixin = require("can-event-queue/map/map");
+var ObservationRecorder = require("can-observation-recorder");
 
-var observeDataSymbol = canSymbol.for("can.observeData");
-
-function getObserveData(stream) {
-	var observeData = stream[observeDataSymbol];
-	if(!observeData) {
-		observeData = Object.create(null);
-		observeData.onValueHandlers = [];
-		observeData.onErrorHandlers = [];
-		Object.defineProperty(stream, observeDataSymbol, {
-			enumerable: false,
-			configurable: false,
-			writable: false,
-			value: observeData
-		});
-	}
-	return observeData;
-}
+var metaSymbol = canSymbol.for("can.meta");
+var onKeyValueSymbol = canSymbol.for("can.onKeyValue");
+var offKeyValueSymbol = canSymbol.for("can.offKeyValue");
 
 var keyNames = {
-	"value": {on: "onValue", handlers: "onValueHandlers", off: "offValue", handler: "onValueHandler"},
-	"error": {on: "onError", handlers: "onErrorHandlers", off: "offError", handler: "onErrorHandler"}
+	value: {
+		on: "onValue",
+		off: "offValue",
+		handler: "onValueHandler",
+		handlers: "onValueHandlers"
+	},
+	error: {
+		on: "onError",
+		off: "offError",
+		handler: "onErrorHandler",
+		handlers: "onErrorHandlers"
+	}
 };
+
+function ensureMeta(obj) {
+	var meta = obj[metaSymbol];
+
+	if (!meta) {
+		meta = {};
+		canReflect.setKeyValue(obj, metaSymbol, meta);
+	}
+
+	return meta;
+}
 
 // get the current value from a stream
 function getCurrentValue(stream, key) {
-	if(stream._currentEvent && stream._currentEvent.type === key) {
+	if (stream._currentEvent && stream._currentEvent.type === key) {
 		return stream._currentEvent.value;
 	} else {
 		var names = keyNames[key];
-		if(!names) {
+		if (!names) {
 			return stream[key];
 		}
 		var VALUE,
-			valueHandler = function(value){
+			valueHandler = function(value) {
 				VALUE = value;
 			};
 		stream[names.on](valueHandler);
@@ -49,124 +53,155 @@ function getCurrentValue(stream, key) {
 	}
 }
 
-if (Kefir) {
-	// makes the CID property a virtual property whose value gets defined later.
-	defineLazyValue(Kefir.Observable.prototype,"_cid", function(){
-		return CID({});
+Kefir.Observable.prototype._eventSetup = function eventSetup() {
+	var stream = this;
+	var meta = ensureMeta(stream);
+
+	meta.bound = true;
+
+	meta.onValueHandler = function onValueHandler(newValue) {
+		var oldValue = meta.value;
+		meta.value = newValue;
+
+		// only send events for a change
+		if (newValue !== oldValue) {
+			mapEventsMixin.dispatch.call(
+				stream,
+				{ type: "value" },
+				[newValue, oldValue]
+			);
+		}
+	};
+
+	meta.onErrorHandler = function onErrorHandler(error) {
+		var prevError = meta.error;
+		meta.error = error;
+
+		mapEventsMixin.dispatch.call(
+			stream,
+			{ type: "error" },
+			[error, prevError]
+		);
+	};
+
+	stream.onValue(meta.onValueHandler);
+	stream.onError(meta.onErrorHandler);
+};
+
+Kefir.Observable.prototype._eventTeardown = function eventTeardown() {
+	var stream = this;
+	var meta = ensureMeta(stream);
+
+	meta.bound = false;
+
+	stream.offValue(meta.onValueHandler);
+	stream.offError(meta.onErrorHandler);
+};
+
+// Observable is parent of Kefir.Stream
+canReflect.assignSymbols(Kefir.Observable.prototype, {
+	"can.onKeyValue": function onKeyValue() {
+		return mapEventsMixin[onKeyValueSymbol].apply(
+			this,
+			arguments
+		);
+	},
+	"can.offKeyValue": function() {
+		return mapEventsMixin[offKeyValueSymbol].apply(
+			this,
+			arguments
+		);
+	},
+	"can.getKeyValue": function(key) {
+		var stream = this;
+		var meta = ensureMeta(stream);
+
+		if (!keyNames[key]) {
+			return stream[key];
+		}
+
+		ObservationRecorder.add(stream, key);
+
+		if (meta.bound) {
+			return meta[key];
+		} else {
+			// we haven't been bound ... see what we can get from the observable
+			// using internals for performance ...
+			var currentValue = getCurrentValue(stream, key);
+
+			// save current value so we won't through events if we provided a value
+			meta[key] = currentValue;
+
+			return currentValue;
+		}
+	},
+	"can.getValueDependencies": function getValueDependencies() {
+		var sources;
+		var stream = this;
+
+		// streams created by methods like .scan have a single source,
+		// stored in stream._source
+		if (stream._source != null) {
+			sources = [stream._source];
+
+		// ... while methods like .combine have multiple sources
+		// stored as an array in stream._sources
+		} else if (stream._sources != null) {
+			sources = stream._sources;
+		}
+
+		if (sources != null) {
+			return {
+				valueDependencies: new Set(sources)
+			};
+		}
+	}
+});
+
+Kefir.emitterProperty = function() {
+	var emitter;
+	var setLastValue = false;
+	var lastValue, lastError;
+
+	var stream = Kefir.stream(function(EMITTER) {
+		emitter = EMITTER;
+		if (setLastValue) {
+			emitter.value(lastValue);
+		}
+		return function() {
+			emitter = undefined;
+		};
 	});
 
-	// Observable is parent of Kefir.Stream
-	canReflect.assignSymbols(Kefir.Observable.prototype, {
-		"can.onKeyValue": function(key, handler){
-			var names = keyNames[key];
-			//!steal-remove-start
-			if(!names) {
-				dev.warn("can-kefir: You can not listen to the "+key+" property on a Kefir stream.");
-			}
-			//!steal-remove-end
-
-			var observeData = getObserveData(this);
-			var handlers = observeData[names.handlers];
-			if( handlers.length === 0 ) {
-				var stream = this;
-				var onHandler = observeData[names.handler] = function(value){
-					// only send events for a change
-					if(value !== observeData[key]) {
-						observeData[key] = value;
-						handlers.forEach(function(handler){
-							canBatch.queue([handler, stream, [value]]);
-						});
-					}
-				};
-				// Must push handler so it can be called immediately
-				handlers.push(handler);
-				this[names.on](onHandler);
+	var property = stream.toProperty(function() {
+		return lastValue;
+	});
+	property.emitter = {
+		value: function(newValue) {
+			if (emitter) {
+				return emitter.emit(newValue);
 			} else {
-				handlers.push(handler);
-			}
-
-		},
-		"can.offKeyValue": function(key, handler){
-			var names = keyNames[key];
-
-			var observeData = getObserveData(this);
-			var handlers = observeData[names.handlers];
-
-			var index = handlers.indexOf(handler);
-			if(index !== -1) {
-				handlers.splice(index, 1);
-				if(handlers.length === 0) {
-					this[names.off](observeData[names.handler]);
-					delete this[observeDataSymbol];
-				}
+				setLastValue = true;
+				lastValue = newValue;
 			}
 		},
-		"can.getKeyValue": function(key){
-
-			if(!keyNames[key]) {
-				return this[key];
+		error: function(error) {
+			if (emitter) {
+				return emitter.error(error);
+			} else {
+				lastError = error;
 			}
+		}
+	};
+	property.emitter.emit = property.emitter.value;
 
-			Observation.add(this, key);
-			// we haven't been bound ... see what we can get from the observable
-			if(!this[observeDataSymbol]) {
-				// using internals for performance ...
-				var observeData = getObserveData(this);
-				var currentValue = getCurrentValue(this, key);
-				// save current value so we won't through events if we provided a value
-				return observeData[key] = currentValue;
-			}
-			return getObserveData(this)[key];
-
+	canReflect.assignSymbols(property, {
+		"can.setKeyValue": function setKeyValue(key, value) {
+			this.emitter[key](value);
 		}
 	});
 
-	Kefir.emitterProperty = function(){
-		var emitter;
-		var setLastValue = false;
-		var lastValue,
-			lastError;
-
-		var stream = Kefir.stream(function(EMITTER){
-			emitter = EMITTER;
-			if(setLastValue) {
-				emitter.value(lastValue);
-			}
-			return function(){
-				emitter = undefined;
-			};
-		});
-
-		var property = stream.toProperty(function(){
-			return lastValue;
-		});
-		property.emitter = {
-			value: function(newValue) {
-				if(emitter) {
-					return emitter.emit(newValue);
-				} else {
-					setLastValue = true;
-					lastValue = newValue;
-				}
-			},
-			error: function(error) {
-				if(emitter) {
-					return emitter.error(error);
-				} else {
-					lastError = error;
-				}
-			}
-		};
-		property.emitter.emit = property.emitter.value;
-
-		canReflect.assignSymbols(property,{
-			"can.setKeyValue": function(key, value){
-				this.emitter[key](value);
-			}
-		});
-
-		return property;
-	};
-}
+	return property;
+};
 
 module.exports = Kefir;
