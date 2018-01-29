@@ -44,12 +44,10 @@
     "streams"
   ],
   "dependencies": {
-    "can-event": "^3.7.0",
-    "can-event-queue": "^0.15.3",
+    "can-event-queue": "<2.0.0",
     "can-observation-recorder": "<2.0.0",
     "can-reflect": "^1.11.1",
     "can-symbol": "^1.0.0",
-    "can-util": "^3.9.0",
     "kefir": "^3.5.1"
   },
   "devDependencies": {
