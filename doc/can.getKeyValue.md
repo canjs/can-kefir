@@ -19,15 +19,15 @@ is used to listen to changes, it will immediately log 1.  However,
 that value is preserved so `getKeyValue` can still be used:
 
 
-```javascript
+```js
 import Kefir from "can-kefir";
 
 const stream = Kefir.stream(function(emit){
-  emit.value(1);
+	emit.value(1);
 });
 
 canReflect.onKeyValue(stream, "value", function(newVal){
-  console.log("new value", newVal);
+	console.log("new value", newVal);
 }); // logs 1
 
 canReflect.getKeyValue(stream,"value") //-> 1

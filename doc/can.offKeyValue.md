@@ -9,16 +9,16 @@ when the underlying stream emits either a `value` or `error` with a new value.
 [can-reflect/observe.offKeyValue can-reflect.offKeyValue] will use this function
 to stop listening to when emitted `value`s or `error`s change.
 
-```javascript
+```js
 import Kefir from "can-kefir";
 
 const count = Kefir.sequentially(1000, [1, 2, 2, 3]);
 
 function handler(newVal) {
-  console.log("new value", newVal); // logs 1, 2
-  if(newVal > 2) {
-    canReflect.offKeyValue(stream, "value", handler);
-  }
+	console.log("new value", newVal); // logs 1, 2
+	if(newVal > 2) {
+		canReflect.offKeyValue(stream, "value", handler);
+	}
 }
 
 canReflect.onKeyValue(stream, "value", handler);

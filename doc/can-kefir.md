@@ -32,7 +32,7 @@ last emitted value or error.
 
 The following will show a number increasing to 3 over 3 seconds:
 
-```javascript
+```js
 import Kefir from "can-kefir";
 
 const countTo3Stream = Kefir.sequentially(1000,[1,2,3]);
@@ -40,7 +40,7 @@ const countTo3Stream = Kefir.sequentially(1000,[1,2,3]);
 const view = stache("<p>Number: {{countTo3Stream.value}}</p>");
 
 const frag = view({
-  countTo3Stream: countTo3Stream
+	countTo3Stream: countTo3Stream
 });
 
 document.body.appendChild(frag);
@@ -51,13 +51,13 @@ document.body.appendChild(frag);
 Use [can-kefir/emitterProperty] to create an stream object that also
 has an emitter-like object attached.  The following creates an `age` stream that we can emit events on with its `emitter.value()` method:
 
-```javascript
+```js
 import Kefir from "can-kefir";
 
 const age = Kefir.emitterProperty();
 
 age.onValue(function(age){
-  console.log(age)
+	console.log(age)
 });
 
 age.emitter.value(20) //-> logs 20

@@ -16,13 +16,13 @@ property's [emitter object](https://rpominov.github.io/kefir/#emitter-object).
 The end result is a single object that has methods of a stream, property and
 an attached emitter-like object.  
 
-```javascript
+```js
 import Kefir from "can-kefir";
 
 const age = Kefir.emitterProperty();
 
 age.onValue(function(age){
-  console.log(age)
+	console.log(age)
 });
 
 age.emitter.value(20) //-> logs 20
