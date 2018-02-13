@@ -11,13 +11,13 @@ stream's last emitted `value` or `error`.  This symbol is only added to
 to emit a `value` or `error` on the emitterProperty.
 
 
-```js
-var Kefir = require("can-kefir");
+```javascript
+import Kefir from "can-kefir";
 
-var age = Kefir.emitterProperty();
+const age = Kefir.emitterProperty();
 
 age.onValue(function(value){
-	console.log(value)
+  console.log(value)
 });
 
 canReflect.setKeyValue(age,"value",30) // logs 30
