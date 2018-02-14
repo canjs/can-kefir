@@ -14,11 +14,11 @@ Notice how the following only logs 3 numbers even though 4 numbers are emitted:
 ```js
 import Kefir from "can-kefir";
 
-const count = Kefir.sequentially(1000, [1, 2, 2, 3]);
+const count = Kefir.sequentially( 1000, [ 1, 2, 2, 3 ] );
 
-canReflect.onKeyValue(stream, "value", function(newVal){
-	console.log("new value", newVal);
-}); // logs 1, 2, 3
+canReflect.onKeyValue( stream, "value", function( newVal ) {
+	console.log( "new value", newVal );
+} ); // logs 1, 2, 3
 ```
 
 

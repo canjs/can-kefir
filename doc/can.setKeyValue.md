@@ -16,11 +16,11 @@ import Kefir from "can-kefir";
 
 const age = Kefir.emitterProperty();
 
-age.onValue(function(value){
-	console.log(value)
-});
+age.onValue( function( value ) {
+	console.log( value );
+} );
 
-canReflect.setKeyValue(age,"value",30) // logs 30
+canReflect.setKeyValue( age, "value", 30 ); // logs 30
 ```
 
 @param {String} name Either `value` to emit value or `error` to
