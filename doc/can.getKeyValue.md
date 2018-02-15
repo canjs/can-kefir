@@ -20,17 +20,17 @@ that value is preserved so `getKeyValue` can still be used:
 
 
 ```js
-var Kefir = require("can-kefir");
+import Kefir from "can-kefir";
 
-var stream = Kefir.stream(function(emit){
-	emit.value(1);
-});
+const stream = Kefir.stream( function( emit ) {
+	emit.value( 1 );
+} );
 
-canReflect.onKeyValue(stream, "value", function(newVal){
-	console.log("new value", newVal);
-}); // logs 1
+canReflect.onKeyValue( stream, "value", function( newVal ) {
+	console.log( "new value", newVal );
+} ); // logs 1
 
-canReflect.getKeyValue(stream,"value") //-> 1
+canReflect.getKeyValue( stream, "value" ); //-> 1
 ```
 
 @param {String} name Either `value` for values emitted by the stream or `error` for

@@ -17,15 +17,15 @@ The end result is a single object that has methods of a stream, property and
 an attached emitter-like object.  
 
 ```js
-var Kefir = require("can-kefir");
+import Kefir from "can-kefir";
 
-var age = Kefir.emitterProperty();
+const age = Kefir.emitterProperty();
 
-age.onValue(function(age){
-  console.log(age)
-});
+age.onValue( function( age ) {
+	console.log( age );
+} );
 
-age.emitter.value(20) //-> logs 20
+age.emitter.value( 20 ); //-> logs 20
 
-age.emitter.value(30) //-> logs 30
+age.emitter.value( 30 ); //-> logs 30
 ```

@@ -10,18 +10,18 @@ when the underlying stream emits either a `value` or `error` with a new value.
 to stop listening to when emitted `value`s or `error`s change.
 
 ```js
-var Kefir = require("can-kefir");
+import Kefir from "can-kefir";
 
-var count = Kefir.sequentially(1000, [1, 2, 2, 3]);
+const count = Kefir.sequentially( 1000, [ 1, 2, 2, 3 ] );
 
-function handler(newVal) {
-	console.log("new value", newVal); // logs 1, 2
-	if(newVal > 2) {
-		canReflect.offKeyValue(stream, "value", handler);
+function handler( newVal ) {
+	console.log( "new value", newVal ); // logs 1, 2
+	if ( newVal > 2 ) {
+		canReflect.offKeyValue( stream, "value", handler );
 	}
 }
 
-canReflect.onKeyValue(stream, "value", handler);
+canReflect.onKeyValue( stream, "value", handler );
 ```
 
 
