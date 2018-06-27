@@ -1,3 +1,4 @@
+"use strict";
 var Kefir = require("kefir");
 var canSymbol = require("can-symbol");
 var canReflect = require("can-reflect");
