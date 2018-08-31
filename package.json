@@ -1,6 +1,6 @@
 {
   "name": "can-kefir",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Reflects Kefir streams so they work with the rest of CanJS",
   "homepage": "http://canjs.com",
   "repository": {
