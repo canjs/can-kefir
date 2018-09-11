@@ -9,12 +9,6 @@ var metaSymbol = canSymbol.for("can.meta");
 var onKeyValueSymbol = canSymbol.for("can.onKeyValue");
 var offKeyValueSymbol = canSymbol.for("can.offKeyValue");
 
-// https://github.com/donejs/bitballs/issues/332
-// Kefir can appear to be an ES module.  This works around that.
-if(Object.isExtensible && !Object.isExtensible(Kefir)) {
-	Kefir = Kefir.Kefir;
-}
-
 var keyNames = {
 	value: {
 		on: "onValue",
@@ -63,6 +57,12 @@ function getCurrentValue(stream, key) {
 // The conditional is needed or the global CanJS build,
 // this code should not break if Kefir is not bundled
 if (Kefir) {
+	// https://github.com/donejs/bitballs/issues/332
+	// Kefir can appear to be an ES module.  This works around that.
+	if(Object.isExtensible && !Object.isExtensible(Kefir)) {
+		Kefir = Kefir.Kefir;
+	}
+
 	Kefir.Observable.prototype._eventSetup = function eventSetup() {
 		var stream = this;
 		var meta = ensureMeta(stream);
