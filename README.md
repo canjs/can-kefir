@@ -5,8 +5,6 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/canjs/can-kefir/blob/master/LICENSE)
 [![npm version](https://badge.fury.io/js/can-kefir.svg)](https://www.npmjs.com/package/can-kefir)
 [![Travis build status](https://travis-ci.org/canjs/can-kefir.svg?branch=master)](https://travis-ci.org/canjs/can-kefir)
-[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/canjs/can-kefir?branch=master&svg=true)](https://ci.appveyor.com/project/matthewp/can-kefir)
-[![Coverage status](https://coveralls.io/repos/github/canjs/can-kefir/badge.svg?branch=master)](https://coveralls.io/github/canjs/can-kefir?branch=master)
 [![Greenkeeper badge](https://badges.greenkeeper.io/canjs/can-kefir.svg)](https://greenkeeper.io/)
 
 Reflects [Kefir](https://rpominov.github.io/kefir/) streams so they work with the rest of [CanJS](https://canjs.com/).
