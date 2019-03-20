@@ -207,3 +207,10 @@ QUnit.test("getValueDependencies with multiple sources", function(assert) {
 		valueDependencies: new Set([a, b, c])
 	});
 });
+
+QUnit.test("can.hasKey Symbol", function() {
+	var foo = Kefir.emitterProperty();
+
+	equal(canReflect.hasKey(foo, 'value'), true, "It has value key");
+	equal(canReflect.hasKey(foo, 'error'), true, "It has error key");
+});

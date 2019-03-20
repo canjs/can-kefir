@@ -208,6 +208,9 @@ if (Kefir) {
 		canReflect.assignSymbols(property, {
 			"can.setKeyValue": function setKeyValue(key, value) {
 				this.emitter[key](value);
+			},
+			"can.hasKey": function hasKey(key) {
+				return key in this.emitter;
 			}
 		});
 
