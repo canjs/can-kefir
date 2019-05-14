@@ -8,7 +8,7 @@ QUnit.module("can-kefir");
 QUnit.test("basics", function(assert) {
 	var EMITTER;
 
-	QUnit.expect(5);
+	assert.expect(5);
 
 	var stream = Kefir.stream(function(emitter) {
 		EMITTER = emitter;
