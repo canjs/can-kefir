@@ -5,10 +5,10 @@ var canReflect = require("can-reflect");
 
 QUnit.module("can-kefir");
 
-QUnit.test("basics", function() {
+QUnit.test("basics", function(assert) {
 	var EMITTER;
 
-	QUnit.expect(5);
+	assert.expect(5);
 
 	var stream = Kefir.stream(function(emitter) {
 		EMITTER = emitter;
@@ -18,17 +18,17 @@ QUnit.test("basics", function() {
 	function valueHandler(value) {
 		valueEventCount++;
 		if (valueEventCount === 1) {
-			QUnit.equal(value, 1, "produced a value");
+			assert.equal(value, 1, "produced a value");
 		} else if (valueEventCount === 2) {
-			QUnit.equal(value, 2, "produced a value");
+			assert.equal(value, 2, "produced a value");
 		} else {
-			QUnit.ok(false, "should not be called");
+			assert.ok(false, "should not be called");
 		}
 	}
 	canReflect.onKeyValue(stream, "value", valueHandler);
 
 	EMITTER.value(1);
-	QUnit.equal(canReflect.getKeyValue(stream, "value"), 1, "got initial value");
+	assert.equal(canReflect.getKeyValue(stream, "value"), 1, "got initial value");
 
 	EMITTER.value(2);
 	canReflect.offKeyValue(stream, "value", valueHandler);
@@ -39,15 +39,15 @@ QUnit.test("basics", function() {
 	function errorHandler(value) {
 		errorEventCount++;
 		if (errorEventCount === 1) {
-			QUnit.equal(value, "a", "produced an error");
+			assert.equal(value, "a", "produced an error");
 		} else {
-			QUnit.ok(false, "no more errors");
+			assert.ok(false, "no more errors");
 		}
 	}
 	canReflect.onKeyValue(stream, "error", errorHandler);
 
 	EMITTER.error("a");
-	QUnit.equal(
+	assert.equal(
 		canReflect.getKeyValue(stream, "error"),
 		"a",
 		"got initial value"
@@ -57,7 +57,7 @@ QUnit.test("basics", function() {
 	EMITTER.error("b");
 });
 
-QUnit.test("properties can be read without binding", function() {
+QUnit.test("properties can be read without binding", function(assert) {
 	var EMITTER;
 
 	var property = Kefir.stream(function(emitter) {
@@ -67,7 +67,7 @@ QUnit.test("properties can be read without binding", function() {
 	property.onValue(function() {});
 	EMITTER.value(10);
 
-	QUnit.equal(
+	assert.equal(
 		canReflect.getKeyValue(property, "value"),
 		10,
 		"got property value"
@@ -119,24 +119,24 @@ QUnit.test("callbacks are within a batch", function(assert) {
 	assert.equal(valueChangeCounter, 1);
 });
 
-QUnit.test("Kefir.emitterProperty", function() {
+QUnit.test("Kefir.emitterProperty", function(assert) {
 	var stream = new Kefir.emitterProperty();
 
 	var valueEventCount = 0;
 	function valueHandler(value) {
 		valueEventCount++;
 		if (valueEventCount === 1) {
-			QUnit.equal(value, 1, "produced a value");
+			assert.equal(value, 1, "produced a value");
 		} else if (valueEventCount === 2) {
-			QUnit.equal(value, 2, "produced a value");
+			assert.equal(value, 2, "produced a value");
 		} else {
-			QUnit.ok(false, "should not be called");
+			assert.ok(false, "should not be called");
 		}
 	}
 	canReflect.onKeyValue(stream, "value", valueHandler);
 	stream.emitter.emit(1);
 
-	QUnit.equal(canReflect.getKeyValue(stream, "value"), 1, "got initial value");
+	assert.equal(canReflect.getKeyValue(stream, "value"), 1, "got initial value");
 
 	canReflect.setKeyValue(stream, "value", 2);
 	canReflect.offKeyValue(stream, "value", valueHandler);
@@ -146,15 +146,15 @@ QUnit.test("Kefir.emitterProperty", function() {
 	function errorHandler(value) {
 		errorEventCount++;
 		if (errorEventCount === 1) {
-			QUnit.equal(value, "a", "produced an error");
+			assert.equal(value, "a", "produced an error");
 		} else {
-			QUnit.ok(false, "no more errors");
+			assert.ok(false, "no more errors");
 		}
 	}
 	canReflect.onKeyValue(stream, "error", errorHandler);
 
 	stream.emitter.error("a");
-	QUnit.equal(
+	assert.equal(
 		canReflect.getKeyValue(stream, "error"),
 		"a",
 		"got initial value"
@@ -164,21 +164,21 @@ QUnit.test("Kefir.emitterProperty", function() {
 	stream.emitter.error("b");
 });
 
-QUnit.test("get behavior with constant stream", function() {
+QUnit.test("get behavior with constant stream", function(assert) {
 	var stream = Kefir.stream(function(emit) {
 		emit.value(1);
 	});
 
 	canReflect.onKeyValue(stream, "value", function(newVal) {
-		QUnit.equal(newVal, 1, "got new Value");
+		assert.equal(newVal, 1, "got new Value");
 	});
 
-	QUnit.equal(canReflect.getKeyValue(stream, "value"), 1, "undefined");
+	assert.equal(canReflect.getKeyValue(stream, "value"), 1, "undefined");
 });
 
-QUnit.test("read emitter", function() {
+QUnit.test("read emitter", function(assert) {
 	var stream = new Kefir.emitterProperty();
-	QUnit.equal(
+	assert.equal(
 		canReflect.getKeyValue(stream, "emitter"),
 		stream.emitter,
 		"got the emitter"
@@ -208,9 +208,9 @@ QUnit.test("getValueDependencies with multiple sources", function(assert) {
 	});
 });
 
-QUnit.test("can.hasKey Symbol", function() {
+QUnit.test("can.hasKey Symbol", function(assert) {
 	var foo = Kefir.emitterProperty();
 
-	equal(canReflect.hasKey(foo, 'value'), true, "It has value key");
-	equal(canReflect.hasKey(foo, 'error'), true, "It has error key");
+	assert.equal(canReflect.hasKey(foo, 'value'), true, "It has value key");
+	assert.equal(canReflect.hasKey(foo, 'error'), true, "It has error key");
 });
